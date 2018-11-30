@@ -129,7 +129,7 @@ class WC_Admin_Reports_Variations_Data_Store extends WC_Admin_Reports_Data_Store
 				$extended_attributes = apply_filters( 'woocommerce_rest_reports_products_extended_attributes', $this->extended_attributes, $product_data );
 				foreach ( $extended_attributes as $extended_attribute ) {
 					$function = 'get_' . $extended_attribute;
-					if ( is_callable( array( $product, $function ) ) ) {
+					if ( is_callable( array( $product, $function ) ) && 'get_price' != $function ) {
 						$value                                = $product->{$function}();
 						$extended_info[ $extended_attribute ] = $value;
 					}
@@ -144,9 +144,11 @@ class WC_Admin_Reports_Variations_Data_Store extends WC_Admin_Reports_Data_Store
 							$formatted_attributes[ $formatted_key ] = $value;
 						}
 						$extended_info['attributes'] = $formatted_attributes;
+						$variation_product           = wc_get_product( $variation['variation_id'] );
+						$extended_info['price']      = $variation_product->get_price();
 					}
 				}
-				$extended_info                          = $this->cast_numbers( $extended_info );
+				$extended_info = $this->cast_numbers( $extended_info );
 			}
 			$products_data[ $key ]['extended_info'] = $extended_info;
 		}
